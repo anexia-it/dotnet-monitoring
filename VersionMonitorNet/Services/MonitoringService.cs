@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Threading.Tasks;
 using VersionMonitorNet.Models;
 
 namespace VersionMonitorNet.Services
@@ -10,8 +14,12 @@ namespace VersionMonitorNet.Services
     /// <summary>
     /// Provides monitoring methods
     /// </summary>
-    internal class MonitoringService
+    internal class MonitoringService : IDisposable
     {
+        private const string NUGET_URL_PREFIX = "https://api-v2v3search-0.nuget.org/query?q=packageid:";
+        private const string EMPTY_VERSION_PLACEHOLDER = "<unknown>";
+        private HttpClient _client = new HttpClient();
+
         /// <summary>
         /// Checks if the services are running (database and optional custom services)
         /// </summary>
@@ -38,12 +46,12 @@ namespace VersionMonitorNet.Services
         /// Gets the runtime and modules info
         /// </summary>
         /// <returns></returns>
-        internal dynamic GetModulesInfo()
+        internal async Task<dynamic> GetModulesInfo()
         {
             return new
             {
                 runtime = GetRuntime(),
-                modules = GetModules()
+                modules = await GetModules()
             };
         }
 
@@ -71,27 +79,53 @@ namespace VersionMonitorNet.Services
         /// get info about modules
         /// </summary>
         /// <returns></returns>
-        private List<ModuleInfo> GetModules()
+        private async Task<List<ModuleInfo>> GetModules()
         {
             List<ModuleInfo> modules = new List<ModuleInfo>();
             string entryAssemblyName = VersionMonitor.CallingAssembly.GetName().Name.ToLower();
-            var libraries = AppDomain.CurrentDomain.GetAssemblies();
+            var libraries = AppDomain.CurrentDomain.GetAssemblies().OrderBy(x => x.FullName);
 
             foreach (var library in libraries)
             {
+                AssemblyName assemblyName = library.GetName();
                 // no need to display executing assembly
-                if (library.GetName().Name == entryAssemblyName)
+                if (assemblyName.Name == entryAssemblyName)
                     continue;
 
                 modules.Add(new ModuleInfo()
                 {
-                    Name = library.GetName().Name,
-                    InstalledVersion = library.GetName().Version.ToString(),
-                    NewestVersion = null // todo: newest module version
+                    Name = assemblyName.Name,
+                    InstalledVersion = assemblyName.Version.ToString(),
+                    NewestVersion = (library.GlobalAssemblyCache ? EMPTY_VERSION_PLACEHOLDER : await GetNewestModuleVersion(assemblyName.Name))
                 });
             }
-
             return modules;
+        }
+
+        private async Task<string> GetNewestModuleVersion(string library)
+        {
+            var response = await _client.GetAsync(NUGET_URL_PREFIX + library);
+            // status code verification
+            response.EnsureSuccessStatusCode();
+            // read response content
+            string stringResponse = await response.Content.ReadAsStringAsync();
+
+            var nugetJson = JsonConvert.DeserializeObject<NugetJson>(stringResponse);
+            if (nugetJson != null && nugetJson.data.Count > 0)
+            {
+                var nugetVersions = nugetJson.data.First().Versions;
+                Version maxVersion = null;
+                foreach (var nugetVersion in nugetVersions)
+                {
+                    Version currentVersion;
+                    if (Version.TryParse(nugetVersion.version, out currentVersion))
+                        maxVersion = (maxVersion == null || currentVersion > maxVersion) ? currentVersion : maxVersion;
+                }
+                if (maxVersion != null)
+                    return maxVersion.ToString();
+            }
+
+            return EMPTY_VERSION_PLACEHOLDER;
         }
 
         #endregion
@@ -118,5 +152,11 @@ namespace VersionMonitorNet.Services
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            _client.Dispose();
+            _client = null;
+        }
     }
 }

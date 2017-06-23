@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using VersionMonitorNet.Services;
 
@@ -41,7 +42,7 @@ namespace VersionMonitorNet.Controllers
         /// <param name="access_token"></param>
         /// <returns>json object with runtime and modules infos</returns>
         [HttpGet]
-        public dynamic GetModulesInfo(string access_token)
+        public async Task<dynamic> GetModulesInfo(string access_token)
         {
             var result = CheckAccessToken(access_token);
             if (result != null)
@@ -49,7 +50,7 @@ namespace VersionMonitorNet.Controllers
 
             result = new JsonResult();
             result.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            result.Data = _service.GetModulesInfo();
+            result.Data = await _service.GetModulesInfo();
             return result;
         }
 
