@@ -10,6 +10,7 @@ namespace VersionMonitorNet.Controllers
     /// </summary>
     public class MonitoringController : Controller
     {
+        // error message for missing authentication token
         private const string TOKEN_ERROR_MESSAGE = "Access token not configured";
         private readonly MonitoringService _service;
 

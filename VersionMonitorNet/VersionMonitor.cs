@@ -82,6 +82,10 @@ namespace VersionMonitorNet
             );
         }
 
+        /// <summary>
+        /// Get the version of the current dll (VersionMonitor)
+        /// </summary>
+        /// <returns></returns>
         private static string GetVersionNumber()
         {
             if (String.IsNullOrWhiteSpace(_assemblyVersion))

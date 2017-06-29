@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("VersionMonitorNet")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Tool to monitor dependency and framework versions for .NET Frameworks")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("ANEXIA Internetdienstleistungs GmbH")]
 [assembly: AssemblyProduct("VersionMonitorNet")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]

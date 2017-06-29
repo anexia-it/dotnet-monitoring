@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>VersionMonitorNet</id>
+    <version>1.0.0</version>
+    <title>VersionMonitorNet</title>
+    <authors>ANEXIA Internetdienstleistungs GmbH</authors>
+    <owners>ANEXIA Internetdienstleistungs GmbH</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Tool to monitor dependency and framework versions for .NET Frameworks</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>ANEXIA ANX version monitor dependency library module .NET Framework</tags>
+  </metadata>
+</package>
