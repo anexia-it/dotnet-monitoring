@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VersionMonitorNet.Models
+namespace Anexia.Monitoring.Models
 {
     /// <summary>
     /// Dto for the json object returned by nuget

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
-using VersionMonitorNet.Models;
+using Anexia.Monitoring.Models;
 
-namespace VersionMonitorNet
+namespace Anexia.Monitoring
 {
     /// <summary>
     /// Startpoint for initializing the version monitoring:
@@ -52,7 +52,7 @@ namespace VersionMonitorNet
         /// <param name="app">IApplicationBuilder to map routes</param>
         /// <param name="checkDatabaseFunction">function to check if database is running</param>
         /// <param name="checkCustomServicesFunction">function to check if custom services are running</param>
-        public static void RegisterServiceStateMonitor(RouteCollection routes, Func<bool> checkDatabaseFunction, Func<List<ServiceState>> checkCustomServicesFunction = null)
+        public static void RegisterServiceStateMonitor(RouteCollection routes, Func<bool> checkDatabaseFunction = null, Func<List<ServiceState>> checkCustomServicesFunction = null)
         {
             CheckCustomServicesFunction = checkCustomServicesFunction;
             CheckDatabaseFunction = checkDatabaseFunction;
@@ -93,7 +93,7 @@ namespace VersionMonitorNet
             if (String.IsNullOrWhiteSpace(_assemblyVersion))
             {
                 // only major version number is needed
-                _assemblyVersion = typeof(VersionMonitorNet.VersionMonitor).Assembly.GetName().Version.Major.ToString();
+                _assemblyVersion = typeof(Anexia.Monitoring.VersionMonitor).Assembly.GetName().Version.Major.ToString();
             }
 
             return _assemblyVersion;

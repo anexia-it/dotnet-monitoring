@@ -1,4 +1,4 @@
-﻿namespace VersionMonitorNet.Models
+﻿namespace Anexia.Monitoring.Models
 {
     /// <summary>
     /// Dto for the package-version json object returned by nuget

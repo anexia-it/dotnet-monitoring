@@ -8,9 +8,9 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
-using VersionMonitorNet.Models;
+using Anexia.Monitoring.Models;
 
-namespace VersionMonitorNet.Services
+namespace Anexia.Monitoring.Services
 {
     /// <summary>
     /// Provides monitoring methods
@@ -34,19 +34,30 @@ namespace VersionMonitorNet.Services
         {
             StringBuilder builder = new StringBuilder();
 
+            bool success = true;
+
             // check if database is running
-            if (VersionMonitor.CheckDatabaseFunction == null)
-                builder.AppendLine("Database check is not configured!");
-            else
-                builder.AppendLine(String.Format("Database connection: {0}", VersionMonitor.CheckDatabaseFunction() ? "OK" : "NOK"));
+            if (VersionMonitor.CheckDatabaseFunction != null)
+            {
+                if (!VersionMonitor.CheckDatabaseFunction())
+                {
+                    success = false;
+                }
+            }
 
             // check if custom services are running
             if (VersionMonitor.CheckCustomServicesFunction != null)
             {
                 foreach (var result in VersionMonitor.CheckCustomServicesFunction())
-                    builder.AppendLine(String.Format("{0}: {1}", result.ServiceName, result.IsRunning ? "OK" : "NOK"));
+                {
+                    if (!result.IsRunning)
+                    {
+                        success = false;
+                    }
+                }
             }
 
+            builder.AppendLine(String.Format("{0}", success ? "OK" : "NOK"));
             return builder.ToString();
         }
 

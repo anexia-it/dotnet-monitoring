@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace VersionMonitorNet.Models
+namespace Anexia.Monitoring.Models
 {
     /// <summary>
     /// Dto for the runtime info

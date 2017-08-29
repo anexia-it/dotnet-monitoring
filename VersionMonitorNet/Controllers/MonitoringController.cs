@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using VersionMonitorNet.Services;
+using Anexia.Monitoring.Services;
 
-namespace VersionMonitorNet.Controllers
+namespace Anexia.Monitoring.Controllers
 {
     /// <summary>
     /// APIs for version monitoring

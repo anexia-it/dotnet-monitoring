@@ -1,4 +1,4 @@
-﻿namespace VersionMonitorNet.Models
+﻿namespace Anexia.Monitoring.Models
 {
     /// <summary>
     /// Dto for service state info
