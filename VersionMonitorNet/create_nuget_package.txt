@@ -1,0 +1,3 @@
+# make sure, that the nuspec-file has been created and is included in the solution, then open a comman line in the csproj-folder and execute the following command:
+# msdn-article: https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package
+nuget pack VersionMonitorNet.csproj -IncludeReferencedProjects
