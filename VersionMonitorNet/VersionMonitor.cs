@@ -76,11 +76,11 @@ namespace Anexia.Monitoring
             CallingAssembly = currentAssembly;
 
             routes.MapRoute(
-                  "anxruntime",
-                  ("anxapi/v" + GetVersionNumber() + "/modules"),
-                  new { controller = "Monitoring", action = "GetModulesInfo" },
-                  null,
-                  new[] { "VersionMonitorNetCore.Controllers" }
+                  "anxruntime", //route name
+                  ("anxapi/v" + GetVersionNumber() + "/modules"), // template
+                  new { controller = "Monitoring", action = "GetModulesInfo" }, // defaults
+                  null, // constraints
+                  new[] { "VersionMonitorNetCore.Controllers" } //namespaces
             );
         }
 

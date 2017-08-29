@@ -32,18 +32,11 @@ namespace Anexia.Monitoring.Services
         /// <returns></returns>
         internal string GetServiceStates()
         {
-            StringBuilder builder = new StringBuilder();
-
             bool success = true;
 
             // check if database is running
-            if (VersionMonitor.CheckDatabaseFunction != null)
-            {
-                if (!VersionMonitor.CheckDatabaseFunction())
-                {
-                    success = false;
-                }
-            }
+            if (VersionMonitor.CheckDatabaseFunction != null && !VersionMonitor.CheckDatabaseFunction())
+                success = false;
 
             // check if custom services are running
             if (VersionMonitor.CheckCustomServicesFunction != null)
@@ -53,12 +46,12 @@ namespace Anexia.Monitoring.Services
                     if (!result.IsRunning)
                     {
                         success = false;
+                        break;
                     }
                 }
             }
 
-            builder.AppendLine(String.Format("{0}", success ? "OK" : "NOK"));
-            return builder.ToString();
+            return (success ? "OK" : "NOK");
         }
 
         /// <summary>
@@ -168,6 +161,7 @@ namespace Anexia.Monitoring.Services
                     if (SemanticVersion.TryParse(nugetVersion.version, out currentVersion))
                         maxVersion = (maxVersion == null || currentVersion > maxVersion) ? currentVersion : maxVersion;
                 }
+                
                 if (maxVersion != null)
                     return maxVersion.ToString();
             }
