@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Anexia.Monitoring.Services;
+using VersionMonitorNet.Attributes;
 
 namespace Anexia.Monitoring.Controllers
 {
@@ -25,6 +26,7 @@ namespace Anexia.Monitoring.Controllers
         /// <param name="access_token">the token to allow access to the monitoring routes - must be send as query-param with each api-call</param>
         /// <returns>plain text with state infos</returns>
         [HttpGet]
+        [AllowCrossOrigin]
         public dynamic GetServiceStates(string access_token)
         {
             var result = CheckAccessToken(access_token);
@@ -43,6 +45,7 @@ namespace Anexia.Monitoring.Controllers
         /// <param name="access_token">the token to allow access to the monitoring routes - must be send as query-param with each api-call</param>
         /// <returns>json object with runtime and modules infos</returns>
         [HttpGet]
+        [AllowCrossOrigin]
         public async Task<dynamic> GetModulesInfo(string access_token)
         {
             var result = CheckAccessToken(access_token);
