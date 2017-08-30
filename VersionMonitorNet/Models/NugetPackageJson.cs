@@ -9,6 +9,7 @@ namespace Anexia.Monitoring.Models
     {
         public string Id { get; set; }
         public string Version { get; set; }
+        public string licenseUrl { get; set; }
         public List<NugetPackageVersionJson> Versions { get; set; }
     }    
 }
