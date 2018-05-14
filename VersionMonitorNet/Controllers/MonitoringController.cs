@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Anexia.Monitoring.Services;
 using VersionMonitorNet.Attributes;
+using Newtonsoft.Json;
 
 namespace Anexia.Monitoring.Controllers
 {
@@ -52,9 +53,11 @@ namespace Anexia.Monitoring.Controllers
             if (result != null)
                 return result;
 
-            result = new JsonResult();
-            result.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            result.Data = await _service.GetModulesInfo();
+            // don't use mvc JsonResult as it doesn't support JsonProperty-attributes when serializing data
+            var data = await _service.GetModulesInfo();
+            result = new ContentResult();
+            result.ContentType = "application/json";
+            result.Content = JsonConvert.SerializeObject(data);
             return result;
         }
 
