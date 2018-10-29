@@ -6,11 +6,12 @@
     <title>VersionMonitorNet</title>
     <authors>ANEXIA Internetdienstleistungs GmbH</authors>
     <owners>ANEXIA Internetdienstleistungs GmbH</owners>
-    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/anexia-it/anexia-monitoring-dotnet</projectUrl>
+    <licenseUrl>https://github.com/anexia-it/anexia-monitoring-dotnet/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Tool to monitor dependency and framework versions for .NET Frameworks</description>
     <releaseNotes>Initial release</releaseNotes>
-    <copyright>Copyright 2017</copyright>
+    <copyright>Copyright (c) 2017 ANEXIA Internetdienstleisungs GmbH</copyright>
     <tags>ANEXIA ANX version monitor dependency library module .NET Framework</tags>
   </metadata>
 </package>
