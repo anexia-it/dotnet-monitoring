@@ -18,6 +18,34 @@ Set Access Token and register monitoring routes before adding the default routes
         }
 		...
 
+You can configure blacklist-modules (by regular expressions) wich will be excluded in result-list.
+By default there are three blacklist-regex-configurations done:
+- ^[App_Web]
+- ^[CompiledRazorTemplates]
+- ^[System.]
+
+You can override the default-blacklist by
+
+		...        
+		protected void Application_Start()
+        {
+            ...
+            Anexia.Monitoring.VersionMonitor.SetBlackList(new List<string>(){ "your_regex" });
+            ...
+        }
+		...
+
+Also you can extend the existing blacklist by
+
+		...        
+		protected void Application_Start()
+        {
+            ...
+            Anexia.Monitoring.VersionMonitor.SetAdditionalBlackList(new List<string>(){ "your_regex" });
+            ...
+        }
+		...
+
 ## Usage
 
 The package registers some custom REST endpoints which can be used for monitoring. Make sure that the `custom_access_token` is defined, since this is used for authorization.
