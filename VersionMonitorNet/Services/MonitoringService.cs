@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Anexia.Monitoring.Models;
 
@@ -113,24 +114,27 @@ namespace Anexia.Monitoring.Services
                 // no need to display executing assembly
                 if (assemblyName.Name == entryAssemblyName)
                     continue;
-
-                // try to convert to semantic version
-                string assemblyVersion = assemblyName.Version.ToString();
-                SemanticVersion semanticVersion;
-                SemanticVersion.TryParse(assemblyVersion, out semanticVersion);
-
-                if (semanticVersion != null)
-                    assemblyVersion = semanticVersion.ToString();
-
-                modules.Add(new ModuleInfo()
+                if(!VersionMonitor.BlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success)
+                   && !VersionMonitor.AdditionalBlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success))
                 {
-                    Name = assemblyName.Name,
-                    InstalledVersion = assemblyVersion,
-                    // if module is a nuget package, get the newest version from nuget
-                    NewestVersion = (library.GlobalAssemblyCache ? assemblyVersion : await GetNewestModuleVersion(assemblyName.Name, assemblyVersion)), // todo: get newest version for modules from global assembly cache
-                    //if module is a nuget package, get License
-                    Licenses = (library.GlobalAssemblyCache ? new List<string>() : await GetLicense(assemblyName.Name, assemblyVersion))
-                });
+                    // try to convert to semantic version
+                    string assemblyVersion = assemblyName.Version.ToString();
+                    SemanticVersion semanticVersion;
+                    SemanticVersion.TryParse(assemblyVersion, out semanticVersion);
+
+                    if (semanticVersion != null)
+                        assemblyVersion = semanticVersion.ToString();
+
+                    modules.Add(new ModuleInfo()
+                    {
+                        Name = assemblyName.Name,
+                        InstalledVersion = assemblyVersion,
+                        // if module is a nuget package, get the newest version from nuget
+                        NewestVersion = (library.GlobalAssemblyCache ? assemblyVersion : await GetNewestModuleVersion(assemblyName.Name, assemblyVersion)), // todo: get newest version for modules from global assembly cache
+                        //if module is a nuget package, get License
+                        Licenses = (library.GlobalAssemblyCache ? new List<string>() : await GetLicense(assemblyName.Name, assemblyVersion))
+                    });
+                }
             }
             return modules;
         }

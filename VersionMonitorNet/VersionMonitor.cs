@@ -23,6 +23,21 @@ namespace Anexia.Monitoring
         /// token for accessing the apis
         /// </summary>
         internal static string AccessToken { get; private set; }
+
+        /// <summary>
+        /// blacklist for modules starts with not should been loaded
+        /// </summary>
+        internal static List<string> AdditionalBlackList { get; private set; } =
+            new List<string>();
+        /// <summary>
+        /// blacklist for modules starts with not should been loaded
+        /// </summary>
+        internal static List<string> BlackList { get; private set; } = 
+            new List<string>(){
+                "^[App_Web]",
+                "^[CompiledRazorTemplates]",
+                "^[System.]"
+                };
         /// <summary>
         /// the assembly that is accessing this library
         /// </summary>
@@ -43,6 +58,24 @@ namespace Anexia.Monitoring
         public static void SetAccessToken(string accessToken)
         {
             AccessToken = accessToken;
+        }
+
+        /// <summary>
+        /// Set the blacklistfor the monitoring APIs
+        /// </summary>
+        /// <param name="blackList">the list of module-prefixes not allowed to load in list</param>
+        public static void SetBlackList(List<string> blackList)
+        {
+            BlackList = blackList ?? new List<string>();
+        }
+
+        /// <summary>
+        /// Set the additionalBlackList the monitoring APIs
+        /// </summary>
+        /// <param name="additionalBlackList">the list of module-prefixes on Top not allowed to load in list</param>
+        public static void SetAdditionalBlackList(List<string> additionalBlackList)
+        {
+            AdditionalBlackList = additionalBlackList ?? new List<string>();
         }
 
         /// <summary>
