@@ -43,6 +43,9 @@
       <HintPath>..\packages\NuGet.Versioning.4.0.0\lib\net45\NuGet.Versioning.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SemanticVersion, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cf3d9de2a6c185ee, processorArchitecture=MSIL">
+      <HintPath>..\packages\SemanticVersion.2.1.0\lib\net452\SemanticVersion.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />

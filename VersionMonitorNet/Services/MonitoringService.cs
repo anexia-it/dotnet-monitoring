@@ -23,6 +23,10 @@ namespace Anexia.Monitoring.Services
         /// </summary>
         private const string NUGET_URL_PREFIX = "https://api-v2v3search-0.nuget.org/query?q=packageid:";
         /// <summary>
+        /// Url for querying the netframework releases
+        /// </summary>
+        private const string NET_RELEASES_INDEX = "https://raw.githubusercontent.com/microsoft/dotnet/master/releases/README.md";
+        /// <summary>
         /// Client for calling the nuget-API
         /// </summary>
         private HttpClient _client = new HttpClient();
@@ -63,7 +67,7 @@ namespace Anexia.Monitoring.Services
         {
             return new
             {
-                runtime = GetRuntime(),
+                runtime = await GetRuntime(),
                 modules = await GetModules()
             };
         }
@@ -74,7 +78,7 @@ namespace Anexia.Monitoring.Services
         /// get runtime info
         /// </summary>
         /// <returns></returns>
-        private RuntimeInfo GetRuntime()
+        private async Task<RuntimeInfo> GetRuntime()
         {
             // get current framework and version
             var framework = new FrameworkName(VersionMonitor.CallingAssembly.GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName);
@@ -87,6 +91,11 @@ namespace Anexia.Monitoring.Services
             if (semanticVersion != null)
                 frameworkVersion = semanticVersion.ToString();
 
+            var content = await GetWebContentString(NET_RELEASES_INDEX);
+
+            MatchCollection matches = Regex.Matches(content, @"(?<=- \[\.NET Framework )[0-9.]*");
+            var latestVersion = matches.Count > 0 ? matches[0].Value : null;
+
             return new RuntimeInfo
             {
                 // fix value, this application is only used for .NET Framework
@@ -94,7 +103,7 @@ namespace Anexia.Monitoring.Services
                 PlatformVersion = frameworkVersion,
                 Framework = framework.Identifier,
                 FrameworkInstalledVersion = frameworkVersion,
-                FrameworkNewestVersion = framework.Identifier  //todo: get newest version
+                FrameworkNewestVersion = latestVersion
             };
         }
 
@@ -114,7 +123,7 @@ namespace Anexia.Monitoring.Services
                 // no need to display executing assembly
                 if (assemblyName.Name == entryAssemblyName)
                     continue;
-                if(!VersionMonitor.BlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success)
+                if (!VersionMonitor.BlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success)
                    && !VersionMonitor.AdditionalBlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success))
                 {
                     // try to convert to semantic version
@@ -132,7 +141,7 @@ namespace Anexia.Monitoring.Services
                         // if module is a nuget package, get the newest version from nuget
                         NewestVersion = (library.GlobalAssemblyCache ? assemblyVersion : await GetNewestModuleVersion(assemblyName.Name, assemblyVersion)), // todo: get newest version for modules from global assembly cache
                         //if module is a nuget package, get License
-                        Licenses = (library.GlobalAssemblyCache ? new List<string>() : await GetLicense(assemblyName.Name, assemblyVersion))
+                        Licenses = (library.GlobalAssemblyCache ? new List<string>() : await GetLicense(assemblyName.Name))
                     });
                 }
             }
@@ -147,14 +156,7 @@ namespace Anexia.Monitoring.Services
         /// <returns></returns>
         private async Task<string> GetNewestModuleVersion(string libraryName, string installedVersion)
         {
-            var response = await _client.GetAsync(NUGET_URL_PREFIX + libraryName);
-            // status code verification
-            response.EnsureSuccessStatusCode();
-            // read response content
-            string stringResponse = await response.Content.ReadAsStringAsync();
-
-            // convert json to dto
-            var nugetJson = JsonConvert.DeserializeObject<NugetJson>(stringResponse);
+            var nugetJson = await GetWebContent<NugetJson>(NUGET_URL_PREFIX + libraryName);
             if (nugetJson != null && nugetJson.data.Count > 0)
             {
                 var nugetVersions = nugetJson.data.First().Versions;
@@ -167,7 +169,7 @@ namespace Anexia.Monitoring.Services
                     if (SemanticVersion.TryParse(nugetVersion.version, out currentVersion))
                         maxVersion = (maxVersion == null || currentVersion > maxVersion) ? currentVersion : maxVersion;
                 }
-                
+
                 if (maxVersion != null)
                     return maxVersion.ToString();
             }
@@ -179,20 +181,41 @@ namespace Anexia.Monitoring.Services
         /// Query nuget with package name to get License
         /// </summary>
         /// <param name="libraryName"></param>
-        /// <param name="installedVersion"></param>
         /// <returns></returns>
-        private async Task<List<string>> GetLicense(string libraryName, string installedVersion)
+        private async Task<List<string>> GetLicense(string libraryName)
         {
-            var response = await _client.GetAsync(NUGET_URL_PREFIX + libraryName);
-            // status code verification
-            response.EnsureSuccessStatusCode();
+            var nugetJson = await GetWebContent<NugetJson>(NUGET_URL_PREFIX + libraryName);
+            return nugetJson != null ? nugetJson.data.Any() ? new List<string> { nugetJson.data[0].licenseUrl } : new List<string>() : new List<string>();
+        }
+
+        /// <summary>
+        ///     Queries a webpage and returns it's content converted to the given format
+        /// </summary>
+        /// <param name="url">The url to call.</param>
+        /// <returns>Task containing the webpage's deserialized content.</returns>
+        private async Task<T> GetWebContent<T>(string url)
+        {
             // read response content
-            string stringResponse = await response.Content.ReadAsStringAsync();
+            var stringResponse = await GetWebContentString(url);
 
             // convert json to dto
-            var nugetJson = JsonConvert.DeserializeObject<NugetJson>(stringResponse);
+            return JsonConvert.DeserializeObject<T>(stringResponse);
+        }
 
-            return nugetJson != null ? nugetJson.data.Any() ? new List<string> { nugetJson.data[0].licenseUrl } : new List<string>() : new List<string>();
+        /// <summary>
+        ///     Queries a webpage and returns it's content converted as string
+        /// </summary>
+        /// <param name="url">The url to call.</param>
+        /// <returns>Task containing the webpage's content.</returns>
+        private async Task<string> GetWebContentString(string url)
+        {
+            var response = await _client.GetAsync(url);
+
+            // status code verification
+            response.EnsureSuccessStatusCode();
+
+            // read response content
+            return await response.Content.ReadAsStringAsync();
         }
 
         #endregion
