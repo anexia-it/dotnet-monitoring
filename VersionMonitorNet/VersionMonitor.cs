@@ -27,7 +27,8 @@ namespace Anexia.Monitoring
         /// <summary>
         /// blacklist for modules starts with not should been loaded
         /// </summary>
-        internal static List<string> AdditionalBlackList { get; private set; }
+        internal static List<string> AdditionalBlackList { get; private set; } =
+            new List<string>();
         /// <summary>
         /// blacklist for modules starts with not should been loaded
         /// </summary>
@@ -65,7 +66,7 @@ namespace Anexia.Monitoring
         /// <param name="blackList">the list of module-prefixes not allowed to load in list</param>
         public static void SetBlackList(List<string> blackList)
         {
-            BlackList = blackList;
+            BlackList = blackList ?? new List<string>();
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Anexia.Monitoring
         /// <param name="additionalBlackList">the list of module-prefixes on Top not allowed to load in list</param>
         public static void SetAdditionalBlackList(List<string> additionalBlackList)
         {
-            AdditionalBlackList = additionalBlackList;
+            AdditionalBlackList = additionalBlackList ?? new List<string>();
         }
 
         /// <summary>

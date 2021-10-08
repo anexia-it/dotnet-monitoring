@@ -111,13 +111,12 @@ namespace Anexia.Monitoring.Services
             foreach (var library in libraries)
             {
                 AssemblyName assemblyName = library.GetName();
+                // no need to display executing assembly
+                if (assemblyName.Name == entryAssemblyName)
+                    continue;
                 if(!VersionMonitor.BlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success)
                    && !VersionMonitor.AdditionalBlackList.Exists(x => Regex.Match(assemblyName.Name, x).Success))
                 {
-                    // no need to display executing assembly
-                    if (assemblyName.Name == entryAssemblyName)
-                        continue;
-
                     // try to convert to semantic version
                     string assemblyVersion = assemblyName.Version.ToString();
                     SemanticVersion semanticVersion;
