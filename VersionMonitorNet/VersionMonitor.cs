@@ -32,7 +32,7 @@ namespace Anexia.Monitoring
         /// <summary>
         /// blacklist for modules starts with not should been loaded
         /// </summary>
-        internal static List<string> BlackList { get; private set; } = 
+        internal static List<string> BlackList { get; private set; } =
             new List<string>(){
                 "^[App_Web]",
                 "^[CompiledRazorTemplates]",
@@ -41,11 +41,35 @@ namespace Anexia.Monitoring
         /// <summary>
         /// the assembly that is accessing this library
         /// </summary>
-        internal static Assembly CallingAssembly { get; private set; }
+        private static Assembly _callingAssembly { get; set; }
+
+        /// <summary>
+        /// the assembly that is accessing this library
+        /// </summary>
+        internal static Assembly CallingAssembly
+        {
+            get
+            {
+                if (_callingAssembly == null)
+                {
+                    return Assembly.GetEntryAssembly();
+                }
+
+                return _callingAssembly;
+            }
+
+            private set
+            {
+                _callingAssembly = value;
+            }
+
+        }
+
         /// <summary>
         /// function to check if the database is running - moved logic to client to keep version monitor platform independent
         /// </summary>
         internal static Func<bool> CheckDatabaseFunction { get; set; }
+
         /// <summary>
         /// function to check if custom services are running
         /// </summary>
