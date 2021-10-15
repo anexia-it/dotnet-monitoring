@@ -10,22 +10,32 @@ using Xunit;
 
 namespace VersionMonitorNet.Test.UnitTests.Controllers
 {
+    /// <summary>
+    ///     Test class for monitoring controller tests
+    /// </summary>
     public class MonitoringControllerTests
     {
-        private readonly string _accestoken;
+        private readonly string _accessToken;
         private readonly MonitoringController _monitoringController;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MonitoringControllerTests"/> class.
+        ///     This constructor will be called each time before any test method.
+        /// </summary>
         public MonitoringControllerTests()
         {
             _monitoringController = new MonitoringController();
-            _accestoken = Guid.NewGuid().ToString();
-            VersionMonitor.SetAccessToken(_accestoken);
+            _accessToken = Guid.NewGuid().ToString();
+            VersionMonitor.SetAccessToken(_accessToken);
         }
 
+        /// <summary>
+        ///     Tests getting service states
+        /// </summary>
         [Fact]
         public void GetServiceStatesTest()
         {
-            var result = (object)_monitoringController.GetServiceStates(_accestoken);
+            var result = (object)_monitoringController.GetServiceStates(_accessToken);
             if (result is ContentResult okObjectResult)
             {
                 Assert.True(okObjectResult.Content == "OK");
@@ -36,10 +46,14 @@ namespace VersionMonitorNet.Test.UnitTests.Controllers
             }
         }
 
+        /// <summary>
+        ///     Tests getting modules info
+        /// </summary>
+        /// <returns>Task containing the test.</returns>
         [Fact]
         public async Task GetModulesInfoTest()
         {
-            var result = await _monitoringController.GetModulesInfo(_accestoken);
+            var result = await _monitoringController.GetModulesInfo(_accessToken);
             if (result is ContentResult okObjectResult)
             {
                 var runtimeInfoModel = JsonConvert.DeserializeObject<RuntimeInfoModel>(okObjectResult.Content);
